@@ -8,31 +8,29 @@
                     fill="currentColor" />
             </svg>
         </div>
-        @if (Route::has('login'))
-            <nav class="-mx-3 flex flex-1 justify-end">
-                @auth
-                    <a href="{{ url('/dashboard') }}"
-                        class="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white">
-                        Dashboard
-                    </a>
-                @else
-                    <x-button.dropdown buttonText="Login">
-                        <div class="py-1" role="none">
-                            <a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1"
-                                id="menu-item-1">Teacher</a>
-                            <a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1"
-                                id="menu-item-2">Student</a>
-                            @auth
-                                <form method="POST" action="#" role="none">
-                                    <button type="submit" class="block w-full px-4 py-2 text-left text-sm text-gray-700"
-                                        role="menuitem" tabindex="-1" id="menu-item-3">Sign out</button>
-                                </form>
-                            @endauth
-                        </div>
-                    </x-button.dropdown>
-                @endauth
-            </nav>
-        @endif
+        <nav class="-mx-3 flex flex-1 justify-end">
+            @auth
+                <a href="{{ url('/dashboard') }}"
+                    class="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white">
+                    Dashboard
+                </a>
+            @else
+                <x-button.dropdown buttonText="Login">
+                    <div class="py-1" role="none">
+                        <a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1"
+                            id="menu-item-1">Teacher</a>
+                        <a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1"
+                            id="menu-item-2">Student</a>
+                        @auth
+                            <form method="POST" action="#" role="none">
+                                <button type="submit" class="block w-full px-4 py-2 text-left text-sm text-gray-700"
+                                    role="menuitem" tabindex="-1" id="menu-item-3">Sign out</button>
+                            </form>
+                        @endauth
+                    </div>
+                </x-button.dropdown>
+            @endauth
+        </nav>
     </x-slot>
 
     <div class="grid gap-6 lg:grid-cols-2 lg:gap-8">
