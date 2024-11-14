@@ -9,6 +9,8 @@ class WelcomeController extends Controller
 {
     public function index()
     {
+        $dashboardUrl = [];
+
         if (Auth::check()) {
             $role = Auth::user()->role;
 
