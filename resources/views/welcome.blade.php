@@ -10,15 +10,15 @@
         </div>
         <nav class="-mx-3 flex flex-1 justify-end">
             @auth
-                <a href="{{ url('/dashboard') }}"
+                <a href="{{ $dashboardUrl }}"
                     class="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white">
                     Dashboard
                 </a>
             @else
                 <x-button.dropdown buttonText="Login">
                     <div class="py-1" role="none">
-                        <a href="{{ route('filament.teacher.auth.login') }}" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1"
-                            id="menu-item-1">Teacher</a>
+                        <a href="{{ route('filament.teacher.auth.login') }}" class="block px-4 py-2 text-sm text-gray-700"
+                            role="menuitem" tabindex="-1" id="menu-item-1">Teacher</a>
                         <a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1"
                             id="menu-item-2">Student</a>
                         @auth
