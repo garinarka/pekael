@@ -19,7 +19,7 @@
                     <div class="py-1" role="none">
                         <a href="{{ route('filament.teacher.auth.login') }}" class="block px-4 py-2 text-sm text-gray-700"
                             role="menuitem" tabindex="-1" id="menu-item-1">Teacher</a>
-                        <a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1"
+                        <a href="{{ route('filament.student.auth.login') }}" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1"
                             id="menu-item-2">Student</a>
                         @auth
                             <form method="POST" action="#" role="none">
