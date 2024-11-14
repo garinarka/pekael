@@ -7,6 +7,7 @@ use Google_Client;
 use Google_Service_Sheets;
 use App\Models\Department;
 use App\Models\Paralel;
+use Illuminate\Console\Scheduling\Schedule;
 
 class SyncGoogleSheetData extends Command
 {
@@ -61,5 +62,10 @@ class SyncGoogleSheetData extends Command
         }
 
         $this->info('Data has been synchronized from Google Sheets.');
+    }
+
+    protected function schedule(Schedule $schedule)
+    {
+        $schedule->command(static::class)->weekly()->sundays()->at('2:00');
     }
 }
