@@ -5,16 +5,19 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\TeacherResource\Pages;
 use App\Filament\Resources\TeacherResource\RelationManagers;
 use App\Models\Teacher;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Gate;
 
 class TeacherResource extends Resource
 {
@@ -101,6 +104,10 @@ class TeacherResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('exportPdf')
+                    ->label('Export PDF')
+                    ->action(fn($record) => static::exportToPDF($record))
+                    ->visible(fn($record) => Gate::allows('export', $record)),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -140,5 +147,44 @@ class TeacherResource extends Resource
             'view' => Pages\ViewTeacher::route('/{record}'),
             'edit' => Pages\EditTeacher::route('/{record}/edit'),
         ];
+    }
+
+    public static function exportToPdf($record)
+    {
+        if (!$record) {
+            Notification::make()
+                ->title('Export failed')
+                ->body('No data found for export.')
+                ->warning();
+            return;
+        }
+
+        try {
+            // Ambil data dari record
+            $data = $record->toArray();
+
+            // Buat PDF menggunakan view
+            $pdf = Pdf::loadView('exports.teacher', ['data' => $data]);
+
+            // Tentukan path file PDF
+            $filePath = storage_path('app/exports/teacher-' . $record->id . '.pdf');
+
+            // Buat direktori jika belum ada
+            if (!is_dir(storage_path('app/exports'))) {
+                mkdir(storage_path('app/exports'), 0755, true);
+            }
+
+            // Simpan file PDF
+            $pdf->save($filePath);
+
+            // Unduh file PDF dan hapus setelah diunduh
+            return response()->download($filePath, 'teacher-' . $record->id . '.pdf')->deleteFileAfterSend();
+        } catch (\Exception $e) {
+            Notification::make()
+                ->title('Export Error')
+                ->body('An error occurred while exporting the data.')
+                ->danger()
+                ->send();
+        }
     }
 }
