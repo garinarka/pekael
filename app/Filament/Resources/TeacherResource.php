@@ -105,7 +105,8 @@ class TeacherResource extends Resource
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\Action::make('exportPdf')
-                    ->label('Export PDF')
+                    ->label('PDF')
+                    ->icon('heroicon-o-archive-box-arrow-down')
                     ->action(fn($record) => static::exportToPDF($record))
                     ->visible(fn($record) => Gate::allows('export', $record)),
             ])
@@ -160,24 +161,18 @@ class TeacherResource extends Resource
         }
 
         try {
-            // Ambil data dari record
             $data = $record->toArray();
 
-            // Buat PDF menggunakan view
             $pdf = Pdf::loadView('exports.teacher', ['data' => $data]);
 
-            // Tentukan path file PDF
             $filePath = storage_path('app/exports/teacher-' . $record->id . '.pdf');
 
-            // Buat direktori jika belum ada
             if (!is_dir(storage_path('app/exports'))) {
                 mkdir(storage_path('app/exports'), 0755, true);
             }
 
-            // Simpan file PDF
             $pdf->save($filePath);
 
-            // Unduh file PDF dan hapus setelah diunduh
             return response()->download($filePath, 'teacher-' . $record->id . '.pdf')->deleteFileAfterSend();
         } catch (\Exception $e) {
             Notification::make()
