@@ -5,16 +5,19 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\StudentResource\Pages;
 use App\Filament\Resources\StudentResource\RelationManagers;
 use App\Models\Student;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Gate;
 
 class StudentResource extends Resource
 {
@@ -97,6 +100,11 @@ class StudentResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('exportPdf')
+                    ->label('PDF')
+                    ->icon('heroicon-o-archive-box-arrow-down')
+                    ->action(fn($record) => static::exportToPdf($record))
+                    ->visible(fn($record) => Gate::allows('export', $record)),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -136,5 +144,39 @@ class StudentResource extends Resource
             'view' => Pages\ViewStudent::route('/{record}'),
             'edit' => Pages\EditStudent::route('/{record}/edit'),
         ];
+    }
+
+    public static function exportToPdf($record)
+    {
+        if (!$record) {
+            Notification::make()
+                ->title('Export Failed')
+                ->body('No data found for export.')
+                ->warning();
+
+            return;
+        }
+
+        try {
+            $data = $record->toArray();
+
+            $pdf = Pdf::loadView('exports.student', ['data' => $data]);
+
+            $filePath = storage_path('app/exports/student-' . $record->id . '.pdf');
+
+            if (!is_dir(storage_path('app/exports'))) {
+                mkdir(storage_path('app/exports'), 0755, true);
+            }
+
+            $pdf->save($filePath);
+
+            return response()->download($filePath, 'student-' . $record->id . '.pdf')->deleteFileAfterSend();
+        } catch (\Exception $e) {
+            Notification::make()
+                ->title('Export Error')
+                ->body('An error occurred while exporting the data.')
+                ->danger()
+                ->send();
+        }
     }
 }
