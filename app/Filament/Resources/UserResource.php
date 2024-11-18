@@ -2,18 +2,19 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\UserResource\Pages;
-use App\Filament\Resources\UserResource\RelationManagers;
-use App\Models\User;
 use Filament\Forms;
+use App\Models\User;
+use Filament\Tables;
 use Filament\Forms\Form;
-use Filament\Infolists\Components\Section;
-use Filament\Infolists\Components\TextEntry;
+use Filament\Tables\Table;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
+use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\TextEntry;
+use App\Filament\Resources\UserResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\UserResource\RelationManagers;
 
 class UserResource extends Resource
 {
@@ -61,9 +62,12 @@ class UserResource extends Resource
                         ])->columns(2),
                         Forms\Components\TextInput::make('password')
                             ->password()
-                            ->required()
-                            ->maxLength(255),
-                    ])
+                            ->maxLength(255)
+                            ->required(fn(?Model $record) => $record === null)
+                            ->dehydrateStateUsing(fn($state) => $state ? bcrypt($state) : null)
+                            ->dehydrated(fn($state) => !empty($state))
+                            ->hint(fn(?Model $record) => $record ? 'Leave blank to keep the current password.' : null),
+                    ]),
             ]);
     }
 
@@ -114,7 +118,8 @@ class UserResource extends Resource
                         TextEntry::make('role'),
                         TextEntry::make('name'),
                         TextEntry::make('email'),
-                        TextEntry::make('password'),
+                        TextEntry::make('password')
+                            ->formatStateUsing(fn($state) => str_repeat('*', 8)),
                     ])->columns(2)
             ]);
     }
