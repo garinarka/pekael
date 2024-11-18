@@ -37,7 +37,7 @@ class SyncGoogleSheetData extends Command
         $client = new Google_Client();
         $client->setApplicationName('YourAppName');
         $client->setScopes([Google_Service_Sheets::SPREADSHEETS_READONLY]);
-        $client->setAuthConfig(storage_path('credentials.json'));
+        $client->setAuthConfig(storage_path('api/credentials.json'));
 
         $service = new Google_Service_Sheets($client);
 
