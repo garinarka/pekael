@@ -18,6 +18,8 @@ use Filament\Infolists\Components\TextEntry;
 use App\Filament\Resources\ClassroomResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\ClassroomResource\RelationManagers;
+use App\Filament\Resources\ClassroomResource\RelationManagers\StudentsRelationManager;
+use App\Filament\Resources\ClassroomResource\RelationManagers\TeacherRelationManager;
 
 class ClassroomResource extends Resource
 {
@@ -110,15 +112,17 @@ class ClassroomResource extends Resource
                 Section::make('Main details')
                     ->description('Classroom main details')
                     ->schema([
+                        TextEntry::make('teacher.name'),
                         TextEntry::make('name'),
-                    ])->columns(3)
+                    ])->columns(2)
             ]);
     }
 
     public static function getRelations(): array
     {
         return [
-            //
+            TeacherRelationManager::class,
+            StudentsRelationManager::class,
         ];
     }
 
